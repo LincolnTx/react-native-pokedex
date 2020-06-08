@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { ImageBackground, StyleSheet, Text, View, Image, ScrollView} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { PokemonInitialModel } from "../../models/initialPokemon";
+import { AppLoading } from 'expo';
 
+import PokemonCard from './../../components/PokemonCard';
 
 import api from '../../services/api';
 
 function  Home () {
     const navigation = useNavigation();
     const [pokemonsList, setPokemon] = useState<PokemonInitialModel[]>([]);
-    
+    let requestLoading = true;
+    let error: string;
     useEffect(() => {
         api.get('').then((response) => {
             const pokemonReponse: PokemonInitialModel[] = [];
@@ -20,7 +23,8 @@ function  Home () {
                 pokemonReponse.push(newPokemon);
             })
             setPokemon(pokemonReponse);
-        });
+        })
+        .catch((requestError) => error = requestError);
     }, []);
     
     function handleNavigateToDetail() {
@@ -36,17 +40,8 @@ function  Home () {
         >
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/*Usar lazy loading nas imagens  */}
-                {pokemonsList.map(pokemon => (
-                    <View style={styles.card} key={pokemon.index}>
-                        <View style={styles.cardHeader}>
-                                <Text style={styles.cod}> {pokemon.index} </Text>
-                            <Text style={styles.title}>{pokemon.name}</Text>
-                        </View>
-
-                        <View style={styles.imageContainer}>
-                            <Image source={{uri: pokemon.imageUrl}} style ={styles.image}/>
-                        </View>
-                    </View>
+                {pokemonsList.map((pokemon:PokemonInitialModel) => (
+                    <PokemonCard key={pokemon.index} pokemon={pokemon ? pokemon : error}/>
                 ))}
 
             </ScrollView>
@@ -62,53 +57,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
 
-    card: {
-        backgroundColor: '#fff',
-        width: 300,
-        height: 300,
-        flexDirection: 'column',
-        borderRadius: 10,
-        overflow: 'hidden',
-        alignItems: 'center',
-        marginTop: 24,
-      },
-
-      cardHeader:{
-        width: '100%',
-        height: '18%',
-        flexDirection: 'row',
-        alignSelf: 'flex-start',
-        paddingHorizontal: 12,
-        justifyContent: 'flex-start',
-        alignItems:'center',
-        backgroundColor: '#f0f0f5',
-      },
-    
-      cod: {
-        fontSize: 16,
-        paddingHorizontal: 24,
-        fontWeight: 'bold'
-      },
-
-      title: {
-        fontSize: 16,
-        paddingHorizontal: 32,
-        fontWeight: '500'
-      },
-
-      imageContainer: {
-        width: '100%',
-        height: '80%', 
-        paddingHorizontal: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-          
-      },
-
-      image: {
-        width: '90%', 
-        height: '90%'
-      },
 });
 
 export default Home;
