@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, StyleSheet, Text, View, Image, ScrollView} from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, Image, ScrollView, TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { PokemonInitialModel } from "../../models/initialPokemon";
-import { AppLoading } from 'expo';
 
 import PokemonCard from './../../components/PokemonCard';
 
@@ -27,8 +26,8 @@ function  Home () {
         .catch((requestError) => error = requestError);
     }, []);
     
-    function handleNavigateToDetail() {
-        navigation.navigate('Details');
+    function handleNavigateToDetail(selectedPokemon: PokemonInitialModel) {
+        navigation.navigate('Details', { selectedPokemon } );
     }
 
 
@@ -39,10 +38,13 @@ function  Home () {
             style = {styles.mainContainer}
         >
             <ScrollView showsVerticalScrollIndicator={false}>
-                {/*Usar lazy loading nas imagens  */}
-                {pokemonsList.map((pokemon:PokemonInitialModel) => (
-                    <PokemonCard key={pokemon.index} pokemon={pokemon ? pokemon : error}/>
-                ))}
+              
+                    {/*Usar lazy loading nas imagens  */}
+                    {pokemonsList.map((pokemon:PokemonInitialModel) => (
+                        <TouchableOpacity key={pokemon.index} onPress={() => handleNavigateToDetail(pokemon) } activeOpacity={0.8} >
+                        <PokemonCard pokemon={pokemon ? pokemon : error}/>
+                        </TouchableOpacity>
+                    ))}
 
             </ScrollView>
         </ImageBackground>
