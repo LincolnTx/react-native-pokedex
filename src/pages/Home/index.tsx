@@ -10,8 +10,10 @@ import api from '../../services/api';
 function  Home () {
     const navigation = useNavigation();
     const [pokemonsList, setPokemon] = useState<PokemonInitialModel[]>([]);
+
     let requestLoading = true;
     let error: string;
+    
     useEffect(() => {
         api.get('').then((response) => {
             const pokemonReponse: PokemonInitialModel[] = [];

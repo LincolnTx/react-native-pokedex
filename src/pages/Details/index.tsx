@@ -1,24 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet , TouchableOpacity, Dimensions, ImageBackground} from 'react-native';
 import { Constants } from 'expo';
 import { PokemonInitialModel } from '../../models/initialPokemon';
 
+import api from '../../services/api';
+import axios from 'axios';
+import { PokemonDetailsModel } from '../../models/pokeminDetails';
+
 function Details ( { route, navigation: { goBack } } ) {
 
-    const { selectedPokemon } = route.params
+    const [pokemon, setPokemon] = useState<PokemonDetailsModel>();
+    const { selectedPokemon } = route.params;
+
+    useEffect( () => {
+
+
+        handleResques()
+        .then(([firstResponse, secondRepose]) => {
+            const pokemonDetailReponse = new PokemonDetailsModel(selectedPokemon, firstResponse.data, secondRepose.data);
+            setPokemon(pokemonDetailReponse);
+            console.log(pokemon);
+        })
+        .catch((requestError) => console.log(requestError));
+    }, []);
+
+    async function handleResques() {
+        let [firstResponse, secondRepose] = [{}, {}];
+        try {
+            [firstResponse, secondRepose] = await Promise.all([
+            axios.get(`https://pokeapi.co/api/v2/pokemon/${selectedPokemon.index}`),
+            axios.get(`https://pokeapi.co/api/v2/pokemon-species/${selectedPokemon.index}/`)
+        ]);
+
+    } catch (error) {
+        console.log(error)
+    }
+    return [firstResponse, secondRepose];
+
+        
+    }
+
     return (
         <ImageBackground source={require('../../assets/pattern.png')} style={styles.mainContainer} >
+            
             <View style={styles.card}> 
                <View style={styles.cardHeader}>
                     <Text style={styles.pokemonIndex}>{selectedPokemon.index}</Text>
                     <Text>Os icones de tipo vem aqui</Text>
+                    <View>
+                        <Text>haha</Text>
+                    </View>
                </View>
-
+                
 
                 <TouchableOpacity onPress={() => goBack()}>
                     <Text>Voltar</Text>
                 </TouchableOpacity>
             </View>
+
         </ImageBackground>
     );
 }
